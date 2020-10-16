@@ -1,0 +1,93 @@
+#include "StdAfx.h"
+#include "Game.h"
+
+#include "HUD/HUD.h"
+#include "Nodes/G2FlowBaseNode.h"
+#include "Weapon.h"
+
+#include <StringUtils.h>
+
+class CFlowNode_Tutorial : public CFlowBaseNode
+{
+    enum EInputPorts
+    {
+        EIP_Trigger,
+    };
+
+    enum EOutputPorts
+    {
+        EOP_Output,
+    };
+public:
+    ////////////////////////////////////////////////////
+    CFlowNode_Tutorial(SActivationInfo* pActInfo)
+    {
+
+    }
+
+    ////////////////////////////////////////////////////
+    virtual ~CFlowNode_Tutorial()
+    {
+    }
+    ////////////////////////////////////////////////////
+    virtual void Serialize(SActivationInfo* pActInfo, TSerialize ser)
+    {
+
+    }
+
+    ////////////////////////////////////////////////////
+    virtual void GetConfiguration(SFlowNodeConfig& config)
+    {
+
+        static const SInputPortConfig inputs[] =
+        {
+            InputPortConfig_AnyType("Trigger", _HELP("")),
+            InputPortConfig<float>("port1", 0, _HELP("")),
+            {0}
+        };
+
+        static const SOutputPortConfig outputs[] =
+        {
+            OutputPortConfig<float>("output0",_HELP("")),
+            {0}
+        };
+
+        config.nFlags |= EFLN_TARGET_ENTITY;
+        config.pInputPorts = inputs;
+        config.pOutputPorts = outputs;
+        config.sDescription = _HELP("");
+        config.SetCategory(EFLN_DEBUG);
+    }
+
+    ////////////////////////////////////////////////////
+    virtual void ProcessEvent(EFlowEvent event, SActivationInfo* pActInfo)
+    {
+        if (IsPortActive(pActInfo, EIP_Trigger))
+        {
+            IEntity* pEntity = pActInfo->pEntity;
+
+            if (pEntity)
+            {
+                SEntitySlotInfo Info;
+                pEntity->GetSlotInfo(0, Info);
+
+                if (Info.pMaterial)
+                {
+                    IMaterial* pOurMaterial = gEnv->p3DEngine->GetMaterialManager()->FindMaterial(Info.pMaterial->GetName());
+                }
+            }
+        }
+    }
+        ////////////////////////////////////////////////////
+        virtual void GetMemoryStatistics(ICrySizer * s)
+        {
+            s->Add(this);
+        }
+
+        virtual IFlowNodePtr Clone(SActivationInfo * pActInfo)
+        {
+            return new CFlowNode_Tutorial(pActInfo);
+        }
+    };
+
+REGISTER_FLOW_NODE_SINGLETON("Material:GetMat", CFlowNode_Tutorial);
